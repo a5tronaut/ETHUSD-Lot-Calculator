@@ -1,1 +1,1 @@
-ETH Lot Size Calculator
+ETHUSD Lot Size Calculator
