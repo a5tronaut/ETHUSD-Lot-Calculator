@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -75,8 +76,13 @@
     font-size: 1rem;
   }
 
-  .highlight {
+  .highlight-lotsize {
     color: #22c55e;
+    font-weight: bold;
+  }
+
+    .highlight-riskamount {
+    color: #cf222e;
     font-weight: bold;
   }
 
@@ -134,7 +140,7 @@ function calculate() {
   output.innerHTML = `
     <div class="row">
       <span>Risk Amount</span>
-      <span class="highlight">$${riskAmount.toFixed(2)}</span>
+      <span class="highlight-riskamount">$${riskAmount.toFixed(2)}</span>
     </div>
     <div class="row">
       <span>Position Size</span>
@@ -142,7 +148,7 @@ function calculate() {
     </div>
     <div class="row">
       <span>Lot Size</span>
-      <span class="highlight">${Math.floor(lots)} Lots</span>
+      <span class="highlight-lotsize">${Math.floor(lots)} Lots</span>
     </div>
     <div class="row">
       <span>Margin Required</span>
@@ -152,5 +158,6 @@ function calculate() {
 }
 </script>
 
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"22be4566de1b4b58a8cf6b21739f778a","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
