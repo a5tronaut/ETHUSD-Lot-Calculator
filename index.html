@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ETH Lot Size Calculator</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #020617;
+    color: #e5e7eb;
+  }
+
+  .container {
+    max-width: 480px;
+    margin: auto;
+    padding: 16px;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 1.4rem;
+    margin-bottom: 16px;
+  }
+
+  .card {
+    background: #0f172a;
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  label {
+    font-size: 0.85rem;
+    opacity: 0.85;
+    display: block;
+    margin-top: 14px;
+  }
+
+  input {
+    width: 92%;
+    margin-top: 6px;
+    padding: 14px;
+    font-size: 1.05rem;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+  }
+
+  button {
+    width: 100%;
+    margin-top: 18px;
+    padding: 16px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 14px;
+    border: none;
+    background: #22c55e;
+    color: #022c22;
+    cursor: pointer;
+  }
+
+  .results {
+    margin-top: 18px;
+    background: #020617;
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 1rem;
+  }
+
+  .highlight {
+    color: #22c55e;
+    font-weight: bold;
+  }
+
+  @media (min-width: 768px) {
+    h1 {
+      font-size: 1.6rem;
+    }
+  }
+</style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>ETHUSD Lot Calculator</h1>
+
+    <div class="card">
+      <label>Account Balance (USD)</label>
+      <input type="number" id="balance" inputmode="decimal" placeholder="1000">
+
+      <label>Risk per Trade (%)</label>
+      <input type="number" id="risk" inputmode="decimal" placeholder="1">
+
+      <label>ETH Price (USD)</label>
+      <input type="number" id="price" inputmode="decimal" placeholder="2000">
+
+      <label>Stop Loss (Pips)</label>
+      <input type="number" id="stoploss" inputmode="decimal" placeholder="50">
+
+      <label>Leverage (x)</label>
+      <input type="number" id="leverage" inputmode="numeric" placeholder="20">
+
+      <button onclick="calculate()">Calculate</button>
+    </div>
+
+    <div class="results" id="output" style="display:none;"></div>
+  </div>
+
+<script>
+function calculate() {
+  const balance = +document.getElementById("balance").value;
+  const riskPercent = +document.getElementById("risk").value;
+  const ethPrice = +document.getElementById("price").value;
+  const stopLoss = +document.getElementById("stoploss").value;
+  const leverage = +document.getElementById("leverage").value;
+
+  if (!balance || !riskPercent || !ethPrice || !stopLoss || !leverage) return;
+
+  const riskAmount = balance * (riskPercent / 100);
+  const positionEth = riskAmount / stopLoss;
+  const lots = positionEth / 0.01;
+  const margin = (positionEth * ethPrice) / leverage;
+
+  const output = document.getElementById("output");
+  output.style.display = "block";
+  output.innerHTML = `
+    <div class="row">
+      <span>Risk Amount</span>
+      <span class="highlight">$${riskAmount.toFixed(2)}</span>
+    </div>
+    <div class="row">
+      <span>Position Size</span>
+      <span>${positionEth.toFixed(4)} ETH</span>
+    </div>
+    <div class="row">
+      <span>Lot Size</span>
+      <span>${Math.floor(lots)} lots</span>
+    </div>
+    <div class="row">
+      <span>Margin Required</span>
+      <span>$${margin.toFixed(2)}</span>
+    </div>
+  `;
+}
+</script>
+
+</body>
+</html>
