@@ -40,7 +40,7 @@
   }
 
   input {
-    width: 92%;
+    width: 94%;
     margin-top: 6px;
     padding: 14px;
     font-size: 1.05rem;
@@ -96,16 +96,21 @@
 
 <body>
   <div class="container">
-    <h1>ETHUSD Lot Calculator</h1>
+    <h1>Lot Size Calculator</h1>
 
     <div class="card">
+      <label>Trading Pair</label>
+      <select id="pair" style="width:100%;padding:14px;border-radius:10px;border:none;font-size:1.05rem;outline:none;margin-top:6px;">
+        <option value="ETHUSD">ETHUSD</option>
+        <option value="BTCUSD">BTCUSD</option>
+      </select>
       <label>Account Balance (USD)</label>
       <input type="number" id="balance" inputmode="decimal" placeholder="1000">
 
       <label>Risk per Trade (%)</label>
       <input type="number" id="risk" inputmode="decimal" placeholder="1">
 
-      <label>ETH Price (USD)</label>
+      <label>Entry Price (USD)</label>
       <input type="number" id="price" inputmode="decimal" placeholder="2000">
 
       <label>Stop Loss (Pips)</label>
@@ -124,16 +129,29 @@
 function calculate() {
   const balance = +document.getElementById("balance").value;
   const riskPercent = +document.getElementById("risk").value;
-  const ethPrice = +document.getElementById("price").value;
+  const price = +document.getElementById("price").value;
   const stopLoss = +document.getElementById("stoploss").value;
   const leverage = +document.getElementById("leverage").value;
+  const pair = document.getElementById("pair").value;
 
-  if (!balance || !riskPercent || !ethPrice || !stopLoss || !leverage) return;
+  if (!balance || !riskPercent || !price || !stopLoss || !leverage) return;
 
   const riskAmount = balance * (riskPercent / 100);
-  const positionEth = riskAmount / stopLoss;
-  const lots = positionEth / 0.01;
-  const margin = (positionEth * ethPrice) / leverage;
+  const positionSize = riskAmount / stopLoss;
+
+  let lots, margin, unit;
+  
+  if (pair === "ETHUSD") {
+    unit = "ETH";
+    lots = positionSize / 0.01;  // original ETH lot sizing untouched
+    margin = (positionSize * price) / leverage;
+  }
+
+  if (pair === "BTCUSD") {
+    unit = "BTC";
+    lots = positionSize / 0.001; // 1 Lot = 0.001 BTC (your rule)
+    margin = (positionSize * price) / leverage;
+  }
 
   const output = document.getElementById("output");
   output.style.display = "block";
@@ -144,7 +162,7 @@ function calculate() {
     </div>
     <div class="row">
       <span>Position Size</span>
-      <span>${positionEth.toFixed(4)} ETH</span>
+      <span>${positionSize.toFixed(4)} ${unit}</span>
     </div>
     <div class="row">
       <span>Lot Size</span>
