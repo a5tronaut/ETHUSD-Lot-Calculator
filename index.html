@@ -1,180 +1,382 @@
-
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lot Size Calculator</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lot Size Calculator</title>
 
-<style>
-  body {
-    margin: 0;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #020617;
-    color: #e5e7eb;
-  }
+    <style>
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        background: #020617;
+        color: #e5e7eb;
+      }
 
-  .container {
-    max-width: 480px;
-    margin: auto;
-    padding: 16px;
-  }
+      .container {
+        max-width: 480px;
+        margin: auto;
+        padding: 16px;
+      }
 
-  h1 {
-    text-align: center;
-    font-size: 1.4rem;
-    margin-bottom: 16px;
-  }
+      h1 {
+        text-align: center;
+        font-size: 1.4rem;
+        margin-bottom: 16px;
+      }
 
-  .card {
-    background: #0f172a;
-    padding: 16px;
-    border-radius: 12px;
-  }
+      .card {
+        background: #0f172a;
+        padding: 16px;
+        border-radius: 12px;
+      }
 
-  label {
-    font-size: 0.85rem;
-    opacity: 0.85;
-    display: block;
-    margin-top: 14px;
-  }
+      label {
+        font-size: 0.85rem;
+        opacity: 0.85;
+        display: block;
+        margin-top: 14px;
+      }
 
-  input {
-    width: 94%;
-    margin-top: 6px;
-    padding: 14px;
-    font-size: 1.05rem;
-    border-radius: 10px;
-    border: none;
-    outline: none;
-  }
+      input {
+        width: 94%;
+        margin-top: 6px;
+        padding: 14px;
+        font-size: 1.05rem;
+        border-radius: 10px;
+        border: none;
+        outline: none;
+      }
 
-  button {
-    width: 100%;
-    margin-top: 18px;
-    padding: 16px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    border-radius: 14px;
-    border: none;
-    background: #22c55e;
-    color: #022c22;
-    cursor: pointer;
-  }
+      button {
+        width: 100%;
+        margin-top: 18px;
+        padding: 16px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        border-radius: 14px;
+        border: none;
+        background: #22c55e;
+        color: #022c22;
+        cursor: pointer;
+      }
 
-  .results {
-    margin-top: 18px;
-    background: #020617;
-    padding: 16px;
-    border-radius: 12px;
-  }
+      .results {
+        margin-top: 18px;
+        background: #020617;
+        padding: 16px;
+        border-radius: 12px;
+        border: 1px solid #1e293b;
+      }
 
-  .row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    font-size: 1rem;
-  }
+      .row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 1rem;
+        padding: 10px 0;
+        border-bottom: 1px solid #1e293b;
+      }
 
-  .highlight-lotsize {
-    color: #22c55e;
-    font-weight: bold;
-  }
+      .row:last-child {
+        border-bottom: none;
+      }
 
-    .highlight-riskamount {
-    color: #cf222e;
-    font-weight: bold;
-  }
+      .row span:first-child {
+        color: #94a3b8;
+        font-size: 0.9rem;
+      }
 
-  @media (min-width: 768px) {
-    h1 {
-      font-size: 1.6rem;
-    }
-  }
-</style>
-</head>
+      .highlight-lotsize {
+        color: #a78bfa;
+        font-weight: bold;
+        font-size: 1.15rem;
+        background: rgba(167, 139, 250, 0.15);
+        padding: 4px 10px;
+        border-radius: 8px;
+      }
 
-<body>
-  <div class="container">
-    <h1>Lot Size Calculator</h1>
+      .highlight-riskamount {
+        color: #ef4444;
+        font-weight: bold;
+      }
 
-    <div class="card">
-      <label>Trading Pair</label>
-      <select id="pair" style="width:100%;padding:14px;border-radius:10px;border:none;font-size:1.05rem;outline:none;margin-top:6px;">
-        <option value="BTCUSD">BTCUSD</option>
-        <option value="ETHUSD">ETHUSD</option>
-      </select>
-      <label>Account Balance (USD)</label>
-      <input type="number" id="balance" inputmode="decimal" placeholder="1000">
+      @media (min-width: 768px) {
+        h1 {
+          font-size: 1.6rem;
+        }
+      }
+    </style>
+  </head>
 
-      <label>Risk per Trade (%)</label>
-      <input type="number" id="risk" inputmode="decimal" placeholder="1">
+  <body>
+    <div class="container">
+      <h1>Lot Size Calculator</h1>
 
-      <label>Entry Price (USD)</label>
-      <input type="number" id="price" inputmode="decimal" placeholder="2000">
+      <div class="card">
+        <label>Trading Pair</label>
+        <select
+          id="pair"
+          style="
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            border: none;
+            font-size: 1.05rem;
+            outline: none;
+            margin-top: 6px;
+          "
+        >
+          <option value="BTCUSD">BTCUSD</option>
+          <option value="ETHUSD">ETHUSD</option>
+        </select>
+        <label>Trade Direction</label>
+        <select
+          id="direction"
+          style="
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            border: none;
+            font-size: 1.05rem;
+            outline: none;
+            margin-top: 6px;
+          "
+        >
+          <option value="long">Long</option>
+          <option value="short">Short</option>
+        </select>
+        <label>Account Balance (USD)</label>
+        <input
+          type="number"
+          id="balance"
+          inputmode="decimal"
+          placeholder="1000"
+        />
 
-      <label>Stop Loss (Pips)</label>
-      <input type="number" id="stoploss" inputmode="decimal" placeholder="50">
+        <label>Risk per Trade (%)</label>
+        <input type="number" id="risk" inputmode="decimal" placeholder="1" />
 
-      <label>Leverage (x)</label>
-      <input type="number" id="leverage" inputmode="numeric" placeholder="20">
+        <label>Entry Price (USD)</label>
+        <input
+          type="number"
+          id="price"
+          inputmode="decimal"
+          placeholder="2000"
+        />
 
-      <button onclick="calculate()">Calculate</button>
+        <label>Stop Loss (Pips)</label>
+        <input
+          type="number"
+          id="stoploss"
+          inputmode="decimal"
+          placeholder="50"
+        />
+        <label>Risk-Reward Ratio (RR)</label>
+        <input type="number" id="rr" inputmode="decimal" placeholder="2" />
+
+        <label>Leverage (x)</label>
+        <input
+          type="number"
+          id="leverage"
+          inputmode="numeric"
+          placeholder="25"
+        />
+
+        <button onclick="calculate()">Calculate</button>
+      </div>
+
+      <div class="results" id="output" style="display: none"></div>
     </div>
 
-    <div class="results" id="output" style="display:none;"></div>
-  </div>
+    <script>
+      function calculate() {
+        console.clear();
+        console.log("=== Lot Size Calculator Debug ===");
 
-<script>
-function calculate() {
-  const balance = +document.getElementById("balance").value;
-  const riskPercent = +document.getElementById("risk").value;
-  const price = +document.getElementById("price").value;
-  const stopLoss = +document.getElementById("stoploss").value;
-  const leverage = +document.getElementById("leverage").value;
-  const pair = document.getElementById("pair").value;
+        const balance = +document.getElementById("balance").value;
+        const riskPercent = +document.getElementById("risk").value;
+        const price = +document.getElementById("price").value;
+        const stopLoss = +document.getElementById("stoploss").value;
+        const leverage = +document.getElementById("leverage").value;
+        const pair = document.getElementById("pair").value;
+        const direction = document.getElementById("direction").value;
+        const rr = +document.getElementById("rr").value;
 
-  if (!balance || !riskPercent || !price || !stopLoss || !leverage) return;
+        console.log("Inputs:", {
+          balance,
+          riskPercent,
+          price,
+          stopLoss,
+          leverage,
+          pair,
+          direction,
+          rr,
+        });
 
-  const riskAmount = balance * (riskPercent / 100);
-  const positionSize = riskAmount / stopLoss;
+        if (
+          !balance ||
+          !riskPercent ||
+          !price ||
+          !stopLoss ||
+          !leverage ||
+          !rr
+        ) {
+          console.warn("Missing input — calculation aborted");
+          return;
+        }
 
-  let lots, margin, unit;
-  
-  if (pair === "ETHUSD") {
-    unit = "ETH";
-    lots = positionSize / 0.01;  // original ETH lot sizing untouched
-    margin = (positionSize * price) / leverage;
-  }
+        const riskAmount = balance * (riskPercent / 100);
+        console.log("Risk Amount:", riskAmount);
 
-  if (pair === "BTCUSD") {
-    unit = "BTC";
-    lots = positionSize / 0.001; // 1 Lot = 0.001 BTC (your rule)
-    margin = (positionSize * price) / leverage;
-  }
+        const positionSize = riskAmount / stopLoss;
+        console.log("Position Size:", positionSize);
 
-  const output = document.getElementById("output");
-  output.style.display = "block";
-  output.innerHTML = `
+        const positionValue = positionSize * price;
+        console.log("Position Value:", positionValue);
+
+        let lots, unit;
+
+        if (pair === "ETHUSD") {
+          unit = "ETH";
+          lots = positionSize / 0.01;
+        }
+
+        if (pair === "BTCUSD") {
+          unit = "BTC";
+          lots = positionSize / 0.001;
+        }
+
+        console.log("Unit:", unit);
+        console.log("Lots:", lots);
+
+        const margin = positionValue / leverage;
+        console.log("Margin Required:", margin);
+
+        let stopLossPrice, takeProfitPrice, liquidationPrice;
+
+        if (direction === "long") {
+          stopLossPrice = price - stopLoss;
+          takeProfitPrice = price + stopLoss * rr;
+          liquidationPrice = price - price / leverage;
+        } else {
+          stopLossPrice = price + stopLoss;
+          takeProfitPrice = price - stopLoss * rr;
+          liquidationPrice = price + price / leverage;
+        }
+
+        console.log("Stop Loss Price:", stopLossPrice);
+        console.log("Take Profit Price:", takeProfitPrice);
+        console.log("Liquidation Price:", liquidationPrice);
+
+        // === Trading Fee (0.05% buy + 0.05% sell and 18% GST) ===
+        const buyValue = price * positionSize;
+        const sellValue = takeProfitPrice * positionSize;
+
+        const buyFee = buyValue * 0.0005;
+        const sellFee = sellValue * 0.0005;
+
+        const tradingFee = buyFee + sellFee;
+        const tradingFeeGST = tradingFee + tradingFee * 0.18;
+
+        console.log("Buy Value:", buyValue);
+        console.log("Sell Value:", sellValue);
+        console.log("Buy Fee (0.5%):", buyFee);
+        console.log("Sell Fee (0.5%):", sellFee);
+        console.log("Total Trading Fee:", tradingFee);
+
+        const rrProfitUSD = riskAmount * rr;
+        console.log("RR Profit (Gross USD):", rrProfitUSD);
+
+        const netPnL = rrProfitUSD - tradingFee;
+        console.log("Net PnL After Fees:", netPnL);
+
+        const liquidationInvalid =
+          (direction === "long" && liquidationPrice >= stopLossPrice) ||
+          (direction === "short" && liquidationPrice <= stopLossPrice);
+
+        console.log("Leverage Warning Triggered:", liquidationInvalid);
+
+        let leverageWarning = "";
+        if (liquidationInvalid) {
+          leverageWarning = `
+      <div style="margin-bottom:12px;padding:12px;border-radius:10px;background:#7f1d1d;color:#fecaca;font-weight:bold;text-align:center;">
+        ⚠️ Leverage too high — Liquidation is closer than Stop Loss
+      </div>
+    `;
+        }
+
+        const output = document.getElementById("output");
+        output.style.display = "block";
+        output.innerHTML = `
+    ${leverageWarning}
+
+    <div class="row">
+      <span>Trade Direction</span>
+      <span>${direction.toUpperCase()}</span>
+    </div>
+
     <div class="row">
       <span>Risk Amount</span>
       <span class="highlight-riskamount">$${riskAmount.toFixed(2)}</span>
     </div>
+
     <div class="row">
       <span>Position Size</span>
       <span>${positionSize.toFixed(4)} ${unit}</span>
     </div>
+
     <div class="row">
       <span>Lot Size</span>
       <span class="highlight-lotsize">${Math.floor(lots)} Lots</span>
     </div>
+
+    <div class="row">
+      <span>Stop Loss Price</span>
+      <span style="color:#facc15;font-weight:bold;">$${stopLossPrice.toFixed(
+        2
+      )}</span>
+    </div>
+
+    <div class="row">
+      <span>Take Profit Price (RR ${rr})</span>
+      <span style="color:#38bdf8;font-weight:bold;">$${takeProfitPrice.toFixed(
+        2
+      )}</span>
+    </div>
+
+    <div class="row">
+      <span>RR Profit (Gross)</span>
+      <span style="color:#22c55e;font-weight:bold;">$${rrProfitUSD.toFixed(
+        2
+      )}</span>
+    </div>
+
+    <div class="row">
+      <span>Trading Fee (inc. 18% GST)</span>
+      <span style="color:#ef4444;font-weight:bold;">-$${tradingFeeGST.toFixed(
+        2
+      )}</span>
+    </div>
+
+    <div class="row">
+      <span>Net PnL (After Fees)</span>
+      <span style="color:#22c55e;font-weight:bold;">$${netPnL.toFixed(2)}</span>
+    </div>
+
+    <div class="row">
+      <span>Liquidation Price (Est.)</span>
+      <span style="color:#facc15;font-weight:bold;">$${liquidationPrice.toFixed(
+        2
+      )}</span>
+    </div>
+
     <div class="row">
       <span>Margin Required</span>
       <span>$${margin.toFixed(2)}</span>
     </div>
   `;
-}
-</script>
-
-</body>
+      }
+    </script>
+  </body>
 </html>
