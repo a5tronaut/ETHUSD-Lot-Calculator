@@ -214,9 +214,9 @@
 
         const balance = +document.getElementById("balance").value;
         const riskPercent = +document.getElementById("risk").value;
-        const price = +document.getElementById("price").value;
-        const stopLoss = +document.getElementById("stoploss").value;
-        const leverage = +document.getElementById("leverage").value;
+        const entryPrice = +document.getElementById("price").value;
+        const stopDistance = +document.getElementById("stoploss").value;
+        const leverageInput = +document.getElementById("leverage").value;
         const pair = document.getElementById("pair").value;
         const direction = document.getElementById("direction").value;
         const rr = +document.getElementById("rr").value;
@@ -224,9 +224,9 @@
         console.log("Inputs:", {
           balance,
           riskPercent,
-          price,
-          stopLoss,
-          leverage,
+          entryPrice,
+          stopDistance,
+          leverageInput,
           pair,
           direction,
           rr,
@@ -235,9 +235,9 @@
         if (
           !balance ||
           !riskPercent ||
-          !price ||
-          !stopLoss ||
-          !leverage ||
+          !entryPrice ||
+          !stopDistance ||
+          !leverageInput ||
           !rr
         ) {
           console.warn("Missing input — calculation aborted");
@@ -247,11 +247,11 @@
         const riskAmount = balance * (riskPercent / 100);
         console.log("Risk Amount:", riskAmount);
 
-        const positionSize = riskAmount / stopLoss;
+        const positionSize = riskAmount / stopDistance;
         console.log("Position Size:", positionSize);
 
-        const positionValue = positionSize * price;
-        console.log("Position Value:", positionValue);
+        const notional = positionSize * entryPrice;
+        console.log("Notional Value:", notional);
 
         let lots, unit;
 
@@ -268,19 +268,31 @@
         console.log("Unit:", unit);
         console.log("Lots:", lots);
 
-        const margin = positionValue / leverage;
+        const margin = notional / leverageInput;
         console.log("Margin Required:", margin);
+
+        const MMR = 0.005; // 0.5% maintenance margin (typical)
+        const FEE_RATE = 0.0005; // 0.05% taker fee (one side)
+
+        const requiredMaxLoss = riskAmount * 2; // safety buffer
+        const maxAllowedLeverage =
+          notional / (requiredMaxLoss + notional * MMR);
+
+        const leverage = Math.min(leverageInput, maxAllowedLeverage);
+        const initialMargin = notional / leverage;
+        const maintenanceMargin = notional * MMR;
+        const maxLoss = initialMargin - maintenanceMargin;
 
         let stopLossPrice, takeProfitPrice, liquidationPrice;
 
         if (direction === "long") {
-          stopLossPrice = price - stopLoss;
-          takeProfitPrice = price + stopLoss * rr;
-          liquidationPrice = price - price / leverage;
+          stopLossPrice = entryPrice - stopDistance;
+          takeProfitPrice = entryPrice + stopDistance * rr;
+          liquidationPrice = entryPrice - maxLoss / positionSize;
         } else {
-          stopLossPrice = price + stopLoss;
-          takeProfitPrice = price - stopLoss * rr;
-          liquidationPrice = price + price / leverage;
+          stopLossPrice = entryPrice + stopDistance;
+          takeProfitPrice = entryPrice - stopDistance * rr;
+          liquidationPrice = entryPrice + maxLoss / positionSize;
         }
 
         console.log("Stop Loss Price:", stopLossPrice);
@@ -288,25 +300,20 @@
         console.log("Liquidation Price:", liquidationPrice);
 
         // === Trading Fee (0.05% buy + 0.05% sell and 18% GST) ===
-        const buyValue = price * positionSize;
-        const sellValue = takeProfitPrice * positionSize;
+        const entryFee = notional * FEE_RATE;
+        const exitFee = takeProfitPrice * positionSize * FEE_RATE;
+        const gst = (entryFee + exitFee) * 0.18;
+        const totalFees = entryFee + exitFee + gst; // incl GST
 
-        const buyFee = buyValue * 0.0005;
-        const sellFee = sellValue * 0.0005;
-
-        const tradingFee = buyFee + sellFee;
-        const tradingFeeGST = tradingFee + tradingFee * 0.18;
-
-        console.log("Buy Value:", buyValue);
-        console.log("Sell Value:", sellValue);
-        console.log("Buy Fee (0.05%):", buyFee);
-        console.log("Sell Fee (0.05%):", sellFee);
-        console.log("Total Trading Fee (inc. 18% GST):", tradingFeeGST);
+        console.log("Entry Fee:", entryFee);
+        console.log("Exit Fee:", exitFee);
+        console.log("GST on Fees:", gst);
+        console.log("Total Trading Fees (inc. GST):", totalFees);
 
         const rrProfitUSD = riskAmount * rr;
         console.log("RR Profit (Gross USD):", rrProfitUSD);
 
-        const netPnL = rrProfitUSD - tradingFee;
+        const netPnL = rrProfitUSD - totalFees;
         console.log("Net PnL After Fees:", netPnL);
 
         const liquidationInvalid =
@@ -372,7 +379,7 @@
 
     <div class="row">
       <span>Trading Fee (inc. 18% GST)</span>
-      <span style="color:#ef4444;font-weight:bold;">-$${tradingFeeGST.toFixed(
+      <span style="color:#ef4444;font-weight:bold;">-$${totalFees.toFixed(
         2
       )}</span>
     </div>
