@@ -142,22 +142,7 @@
           <option value="BTCUSD">BTCUSD</option>
           <option value="ETHUSD">ETHUSD</option>
         </select>
-        <label>Trade Direction</label>
-        <select
-          id="direction"
-          style="
-            width: 100%;
-            padding: 14px;
-            border-radius: 10px;
-            border: none;
-            font-size: 1.05rem;
-            outline: none;
-            margin-top: 6px;
-          "
-        >
-          <option value="long">Long</option>
-          <option value="short">Short</option>
-        </select>
+
         <label>Account Balance (USD)</label>
         <input
           type="number"
@@ -216,7 +201,7 @@
         const stopDistance = +document.getElementById("stoploss").value;
         const leverageInput = +document.getElementById("leverage").value;
         const pair = document.getElementById("pair").value;
-        const direction = document.getElementById("direction").value;
+        const direction = "long";
         const rr = 1;
 
         console.log("Inputs:", {
